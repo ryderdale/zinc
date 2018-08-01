@@ -27,8 +27,7 @@ function renderTemplate(data, template, appendingElementId) {
     .then(template => template.text())
     .then((template) => {
         let regEx = /{{\s*([\w.]+)\s*}}/g; 
-        let HTML = template;
-        HTML=template.replace(regEx, (match, templateValue) => {
+        let HTML=template.replace(regEx, (match, templateValue) => {
             let templateValueArr = templateValue.split('.');
             return templateValueArr.reduce((acc ,curr) => acc[curr], data)
             })
