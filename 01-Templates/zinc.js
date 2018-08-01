@@ -6,52 +6,71 @@
 
 let templateString = `
 <li class="user">
-<img class="user-photo" src="{{ photo }}" alt="Photo of {{ firstName }} {{ lastName }}">
-<div class="user-name">{{ firstName }} {{ lastName }}</div>
+<img class="user-photo" src="{{ thumbnail }}" alt="Photo of {{ first }} {{ last }}">
+<div class="user-name">{{ first }} {{ last }}</div>
 <div class="user-location">{{ city }}, {{ state }}</div>
 <div class="user-email">{{ email }}</div>
 </li>`;
 
 // const data = {
-//     photo: user.picture.thumbnail,
-//     firstName: user.name.first,
-//     lastName: user.name.last,
-//     city: user.location.city,
-//     state: user.location.state,
-//     email: user.email
+//     photo: data.picture.thumbnail,
+//     firstName: data.name.first,
+//     lastName: data.name.last,
+//     city: data.location.city,
+//     state: data.location.state,
+//     email: data.email
 // };
 
 // () => {
-function renderTemplate(data, templateString, appendingElementId) {
+function renderTemplate(data, templateString, appendingElementId, dataKey) {
     // regExSplit = 
     // regexRplace = /{{\s(.*?)\s}}/gm; 
-    let stringArr = templateString.split(/{{(.*?)}}/);
-    let templateProperties = [];
-    for (let i = 0; i<stringArr.length; i++) {
-        if(i%2 == 1) {
-            console.log(i);
-            let intraArr = stringArr[i].split(" ");
-            console.log(intraArr);
-            templateProperties.push(intraArr.join(""));  
-        }
-    };
-    console.log(templateProperties);
-    let newTemplateString;
-    for (let prop in data) {
-        console.log(prop);
-        console.log(data[prop]);
-        // console.log(data.gender);
-        // console.log(prop.value);
-        for (let i=0; i<templateProperties.length; i++) {
-            if(prop === templateProperties[i]) {
-                console.log('match', prop, "with", data[prop]);
-                newTemplateString = templateString.replace(`{{ ${templateProperties[i]} }}`, data[prop]);
-            }  
-        } 
+    if (dataKey) {
+
     }
-    document.getElementById(appendingElementId).insertAdjacentHTML('beforeend', newTemplateString);
+    else {
+        let stringArr = templateString.split(/{{(.*?)}}/);
+        let templateProperties = [];
+        for (let i = 0; i<stringArr.length; i++) {
+            if(i%2 == 1) {
+                console.log(i);
+                let intraArr = stringArr[i].split(" ");
+                console.log(intraArr);
+                templateProperties.push(intraArr.join(""));  
+            }
+        };
+        console.log(templateProperties);
+        let newTemplateString = templateString;
+        for (let prop in data) {
+            console.log(prop);
+            console.log(data[prop]);
+            // console.log(data.gender);
+            // console.log(prop.value);
+            for (let i=0; i<templateProperties.length; i++) {
+                if(prop === templateProperties[i]) {
+                    console.log('match', prop, "with", data[prop]);
+                    newTemplateString = newTemplateString.replace(`{{ ${templateProperties[i]} }}`, data[prop]);
+                }  
+                else {
+                    for(let subprop in data[prop]) {
+                        if(subprop === templateProperties[i]) {
+                            console.log('match',subprop, 'with', data[prop][subprop]);
+                            newTemplateString = newTemplateString.replace(`{{ ${templateProperties[i]} }}`, data[prop][subprop]);
+                        }
+                    }
+                }
+            } 
+        }
+        document.getElementById(appendingElementId).insertAdjacentHTML('beforeend', newTemplateString);
+    }
+    
 }
         
+//repeat sub matching object to teplate value logic for sub properties of data tree
+//add if statement for if dataKey
+
+
+
     // });
 // };
 // templateString.replace(/{{\s(.*?)\s}}/gm, (match, captured) =>  {
