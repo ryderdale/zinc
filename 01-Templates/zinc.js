@@ -6,9 +6,9 @@
 
 let templateString = `
 <li class="user">
-<img class="user-photo" src="{{ thumbnail }}" alt="Photo of {{ first }} {{ last }}">
-<div class="user-name">{{ first }} {{ last }}</div>
-<div class="user-location">{{ city }}, {{ state }}</div>
+<img class="user-photo" src="{{ picture.thumbnail }}" alt="Photo of {{ name.first }} {{ name.last }}">
+<div class="user-name">{{ name.first }} {{ name.last }}</div>
+<div class="user-location">{{ location.city }}, {{ location.state }}</div>
 <div class="user-email">{{ email }}</div>
 </li>`;
 
@@ -22,74 +22,52 @@ let templateString = `
 // };
 
 // () => {
-function renderTemplate(data, templateString, appendingElementId, dataKey) {
-    // regExSplit = 
-    // regexRplace = /{{\s(.*?)\s}}/gm; 
-    if (dataKey) {
-
-    }
-    else {
-        let stringArr = templateString.split(/{{(.*?)}}/);
-        let templateProperties = [];
-        for (let i = 0; i<stringArr.length; i++) {
-            if(i%2 == 1) {
-                console.log(i);
-                let intraArr = stringArr[i].split(" ");
-                console.log(intraArr);
-                templateProperties.push(intraArr.join(""));  
-            }
-        };
-        console.log(templateProperties);
-        let newTemplateString = templateString;
-        for (let prop in data) {
-            console.log(prop);
-            console.log(data[prop]);
-            // console.log(data.gender);
-            // console.log(prop.value);
-            for (let i=0; i<templateProperties.length; i++) {
-                if(prop === templateProperties[i]) {
-                    console.log('match', prop, "with", data[prop]);
-                    newTemplateString = newTemplateString.replace(`{{ ${templateProperties[i]} }}`, data[prop]);
-                }  
-                else {
-                    for(let subprop in data[prop]) {
-                        if(subprop === templateProperties[i]) {
-                            console.log('match',subprop, 'with', data[prop][subprop]);
-                            newTemplateString = newTemplateString.replace(`{{ ${templateProperties[i]} }}`, data[prop][subprop]);
-                        }
-                    }
-                }
-            } 
-        }
-        document.getElementById(appendingElementId).insertAdjacentHTML('beforeend', newTemplateString);
-    }
-    
-}
+function renderTemplate(data, template, appendingElementId) {
+    fetch(`${template}.html`)
+    .then(template => template.text())
+    .then((template) => {
+        let regEx = /{{\s*([\w.]+)\s*}}/g; 
+        let HTML = template;
+        HTML=template.replace(regEx, (match, templateValue) => {
+            let templateValueArr = templateValue.split('.');
+            return templateValueArr.reduce((acc ,curr) => acc[curr], data)
+            })
+        document.getElementById(appendingElementId).insertAdjacentHTML('beforeend', HTML);
+        })
         
-//repeat sub matching object to teplate value logic for sub properties of data tree
-//add if statement for if dataKey
+}; 
 
 
-
-    // });
+//     let HTML = templateString;
+//     HTML = templateString.replace(/{{\s*([\w.]+)\s*}}/g, (match , templateValue) => {
+//         //use for loop to determine if template value contains period(s)
+        
+//         for(let i=0; i<templateValue[i].length; i++) {
+//             //if template value does not contain periods 
+//             if (templateValue[i] == '.') {
+//                 let objectPathArr = templateValue.split('.');
+//                 console.log(objectPathArr);
+//                 let objectValue = data[objectPathArr[0]];
+//                 console.log(objectValue);
+//                 for (let j=1; j<objectPathArr.length; j++) {
+//                     objectValue = objectValue[objectPathArr[j]];
+//                     console.log(objectValue);
+//                 }
+//             HTML = HTML.replace(`{{ ${templateValue} }}`, objectValue);
+//             }
+//             // if(templateValue[i] !== '.') {
+//             //     let objectValue = data[templateValue];
+//             //     HTML = HTML.replace(`{{ ${templateValue} }}`, objectValue);
+//             //     } 
+//             //if template value does contain periods then vaidage thorugh object and isolate nested value 
+            
+//         }
+//         document.getElementById(appendingElementId).insertAdjacentHTML('beforeend', HTML);
+//     })
 // };
-// templateString.replace(/{{\s(.*?)\s}}/gm, (match, captured) =>  {
 
-        // for (let i=0; i<templateProperties.length; i++) {
-        //     templateProperties[i] = 'data.' + templateProperties[i];
-        // }
-        // console.log(templateProperties);
-        // let 
-        // for(let i = 0; i<stringArr.length; i++ ) {
-        //     if(i%2 == 1) {
-        //         strinArr[i] = templateProperties[0];
-        //         stringArr.splice(0);
-        // }
-        // let renderedTemplate = stringArr.join('');
-        // console.log(readyTemplate);
-       
-        // console.log(results); // eslint-disable-line no-console
-    // };
+
+
 
     function populateList (arrayData, templateString, appendingElementId) {
         for (let i=0; i<arrayData.length; i++) {
@@ -107,7 +85,7 @@ function renderTemplate(data, templateString, appendingElementId, dataKey) {
     function init() {
         fetch('https://randomuser.me/api/?results=5')
             .then(res => res.json())
-            .then(json => populateList(json.results,templateString, 'z-user-list'));
+            .then(json => populateList(json.results, 'user', 'z-user-list'));
     }
 
     document.addEventListener('DOMContentLoaded', init);
