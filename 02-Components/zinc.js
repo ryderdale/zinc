@@ -33,13 +33,14 @@ const userData2 = {
 const Zinc = {
     components: {}
 };
-Zinc.registerComponent = function (elementName, templateFile, dataObject, controler) {
 
-    Zinc.components[elementName] = {
-        elementName,
-        templateFile,
-        dataObject,
-        controler
+Zinc.registerComponent = function (configObject) {
+
+    Zinc.components[configObject.elementName] = {
+        elementName: configObject.elementName,
+        templateFile: configObject.templateFile,
+        dataObject: configObject.dataObject,
+        controler: configObject.controler
     }
     // console.log(Zinc.registerComponent);
 };
@@ -62,7 +63,6 @@ Zinc.registerComponent = function (elementName, templateFile, dataObject, contro
                 })
                 userItem.insertAdjacentHTML('beforeend', HTML);
                 controler(currentComponent);
-                console.log(controler);
             })
         // console.log(element, content); // eslint-disable-line no-console
     }
@@ -75,7 +75,6 @@ Zinc.registerComponent = function (elementName, templateFile, dataObject, contro
    let toggleHighlight  = function (component) {
         let listItem = document.querySelector(component['elementName']).childNodes[0];
         listItem.addEventListener('click', () => {
-            console.log('element clicked');
             listItem.classList.toggle('toggleBackground');
         })
     }
@@ -85,7 +84,13 @@ Zinc.registerComponent = function (elementName, templateFile, dataObject, contro
         .then(res => res.json())
         .then(json => {
            for(let i=0; i<json.results.length; i++) {
-                Zinc.registerComponent(`user-item${i}`, 'user', json.results[i], toggleHighlight)
+               let configObject = {
+                elementName: `user-item${i}`,
+                templateFile: 'user',
+                dataObject: json.results[i],
+                controler: toggleHighlight
+               };
+            Zinc.registerComponent(configObject);
            }
         }).then(()=>Zinc.renderComponents(Zinc.components))
         
