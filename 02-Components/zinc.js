@@ -53,6 +53,7 @@ Zinc.registerComponent = function (configObject) {
     function renderComponent(element, content, data, controler) {
         let userItem = document.querySelector(element);
         let currentComponent = Zinc.components[element];
+        console.log(currentComponent);
         fetch(`${content}.html`)
             .then(content => content.text())
             .then((content) => {
@@ -67,13 +68,32 @@ Zinc.registerComponent = function (configObject) {
         // console.log(element, content); // eslint-disable-line no-console
     }
     Zinc.renderComponents = function (components) {
-        for(let component in components) {
-            renderComponent(Zinc.components[component]['elementName'], Zinc.components[component]['templateFile'], Zinc.components[component]['dataObject'], Zinc.components[component].controler);
+        fetch(`index.html`)
+            .then(index => index.text())
+            .then((index) => {
+                let regEx = /(?<=<)[\w-]+(?=>)/g; 
+                let htmlElements = index.match(regEx);
+                console.log(htmlElements);
+                for (let i = 0; i<htmlElements.length; i++) {
+                    console.log(htmlElements[i]);
+                    if(components.hasOwnProperty(htmlElements[i]) === true) {
+                        console.log('true');
+                        renderComponent(Zinc.components[htmlElements[i]]['elementName'], Zinc.components[htmlElements[i]]['templateFile'], Zinc.components[htmlElements[i]]['dataObject'], Zinc.components[htmlElements[i]].controler);
+                    }
+                }
+            })
         }
-    }
+               
+        //create for loop to put every possible element into an array
+        //where elementName of array exisis as property renderComponemt
+        
+
+            
+    
 
    let toggleHighlight  = function (component) {
         let listItem = document.querySelector(component['elementName']).childNodes[0];
+        console.log(listItem);
         listItem.addEventListener('click', () => {
             listItem.classList.toggle('toggleBackground');
         })
